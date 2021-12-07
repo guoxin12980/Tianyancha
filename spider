@@ -1,0 +1,206 @@
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+import openpyxl
+import xlrd
+import time
+import random
+
+
+# 函数运行环境 1，遇到一个excel表格 能够从列表顺序读取第一行公司情况。之后区天眼查查到该公司，给出相应的1，注册资金2实缴资金 3参保人数 4，现在的名字
+def Search(filename):
+    # 初始化
+    self = webdriver.Chrome('./chromedriver')
+    self.implicitly_wait(10)
+    self.get('https://www.tianyancha.com/')  # 打开天眼查首页
+    print(input("请准备登录后敲击回车键以进行"))
+    # 1，先打开对应的excel表格
+    step1 = xlrd.open_workbook(filename)  # 打开文件
+    sheet = step1.sheet_by_index(0)  # 默认找到第一个sheet
+    Company_need_select = sheet.col_values(colx=0)  # 第一行就是需要筛选的公司
+    a = 0
+    for i in Company_need_select:
+        a += 1
+        name = i  # 将公司名字i赋值给name
+
+        self.find_element_by_id('home-main-search').send_keys(name)  # 搜索框搜索要查的公司
+        try:
+            # time.sleep(random.randrange(1, 5, 2))
+            self.find_element_by_xpath(
+                "//*[@class='mainv2_tab1 position-rel']/div/div[2]/div[2]/div/div/span").click()  # 点击搜索
+            time.sleep(0.5)
+            self.implicitly_wait(5)
+        except Exception as e:
+            if self.find_element_by_xpath("//*[@class='container mt74']/div/div").text == '我们只是确认一下你是不是机器人，':
+                print(input("出错了检查一下"))
+            else:
+                self.find_element_by_xpath("//*[@class='tic tic-tyc-logo-txt tyc-text']").click()
+
+        try:
+            self.find_element_by_xpath("//*[@id='search_company_0']/div/div[3]/div/a").click()  # 点击第一个公司
+            time.sleep(0.5)
+            handles = self.window_handles  # 这个时候会生成一个新窗口或新标签页的句柄，代表这个窗口的模拟driver
+            self.switch_to.window(handles[-1])
+            self.implicitly_wait(5)
+            # time.sleep(random.randrange(1, 5, 2))
+            # print(wd.find_element_by_xpath("//*[@class='box -company-box ']/div[3]/div/h1").text)#打印现在名称
+            Name = self.find_element_by_xpath("//*[@id='company_web_top']/div[3]/div[3]/div/h1").text  # 名称是什么
+            Newname = Name
+
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[10]/td[2]").text)#打印地址
+            addrees = self.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[10]/td[2]").text  # 赋值地址
+
+            Addrees = addrees
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[3]").text)#注册资本
+            capacity = (self.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[3]").text)
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[1]").text)#实缴资本
+
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[2]").text)  # 实缴资本多少
+            '''Real_Howmuch = wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[1]").text + wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[2]").text
+            realcapacity = Real_Howmuch
+            # realcapacity.append(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[1]").text+wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[4]/td[2]").text)
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[3]").text)  # 行业
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[4]").text)  # 行业是什么
+            Type_what = wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[3]").text + wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[4]").text
+            Type = Type_what
+            wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[5]").text)  # 人员规模
+            wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[6]").text)  # 多少人
+            HowMP_P = wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[5]").text + wd.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[6]").text
+            people = HowMP_P'''
+            self.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[5]").text  # 人员规模
+            self.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[6]").text  # 多少人
+            HowMP_P = self.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[5]").text + self.find_element_by_xpath(
+                "//*[@id='_container_baseInfo']/table/tbody/tr[7]/td[6]").text
+            people = HowMP_P
+            time.sleep(0.5)
+            # print(wd.find_element_by_xpath("//*[@id='_container_baseInfo']/table/tbody").text)#打印杂七杂八的东西
+            time.sleep(0.5)
+
+            self.close()
+            time.sleep(0.5)
+            self.switch_to.window(handles[0])
+            self.find_element_by_xpath("//*[@class='tic tic-tyc-logo-txt tyc-text']").click()
+            time.sleep(0.5)
+
+
+        except Exception as e:
+            try:
+
+                if self.find_element_by_xpath(
+                        "//*[@id='company_web_top']/div[3]/div[3]/div/h1").text == '我们只是确认一下你是不是机器人，':
+                    print(input("被检测出机器人了"))
+                else:
+
+                    print('没事继续1')
+                    self.find_element_by_xpath("//*[@class='tic tic-tyc-logo-txt tyc-text']").click()
+                    Newname = '没找到'
+                    Addrees = '没找到'
+                    people = '没找到'
+
+            except Exception as e:
+                print(input("出错了检查一下222"))
+                self.find_element_by_xpath("//*[@class='tic tic-tyc-logo-txt tyc-text']").click()
+                Newname = '没找到'
+                Addrees = '没找到'
+                people = '没找到'
+
+        Write_excel = openpyxl.load_workbook(filename)
+        location_sheet = Write_excel['Sheet1']  # 默认为Sheet
+        location_sheet['B%d' % (a)] = Newname  # 打开当前文件把新名字写进去
+        location_sheet['C%s' % (a)] = Addrees
+        # location_sheet['D%s' % (a)] = realcapacity
+        # location_sheet['E%s' % (a)] = Type
+        location_sheet['F%s' % (a)] = people
+        Write_excel.save(filename)
+
+
+'''
+def Save(filename, a, Newname, Addrees):
+
+
+
+'''
+
+'''def body(Nomal,Unomal):
+    for i in Company_need_select:
+
+        a = 1
+        try:
+            Nomal(self, i)
+
+
+
+
+        except Exception as e:
+            Unnomal()
+            continue
+        Save(filename,a,Newname,Addrees)
+
+
+
+
+
+'''
+'''
+time.sleep(0.5)
+Write_excel = openpyxl.load_workbook(filename)
+location_sheet = Write_excel['Sheet1']  # 默认为Sheet
+location_sheet['B%d' % (a)] = '没找到'  # 打开当前文件把新名字写进去
+location_sheet['C%s' % (a)] = '没找到'
+# location_sheet['D%s' % (a)] = realcapacity
+# location_sheet['E%s' % (a)] = Type
+# location_sheet['F%s' % (a)] = people
+Write_excel.save(filename)
+'''
+
+'''except Exception as e:
+        print("出错了")
+        Write_excel = openpyxl.load_workbook(filename)
+        location_sheet = Write_excel['Sheet1']  # 默认为Sheet
+        location_sheet['B%d' % (a)] = "报错"  # 打开当前文件把新名字写进去
+        location_sheet['C%s' % (a)] = "报错"
+        # location_sheet['D%s' % (a)] = realcapacity
+        # location_sheet['E%s' % (a)] = Type
+        # location_sheet['F%s' % (a)] = people
+        Write_excel.save(filename)'''
+
+Search('et_clue.xlsx')
+
+# //*[@id='_container_baseInfo']/table/tbody/tr/td 法人代表
+# //*[@id='_container_baseInfo']/table/tbody/tr[3]/td|td[2] 注册资本|实缴资本
+# //*[@class='content  -shadow -fix']/div[6]/a知识产权
+# //*[@class='position-rel company-header-container']/div/div/div[7]/a/span如果为股份上市则这个为产权数量
+# wd.quit()
+'''
+oldcompany = xlrd.open_workbook("oldcustomer.xlsx")
+sheet = oldcompany.sheet_by_index(1)
+All_company = sheet.col_values(colx=0) #旧的公司现在已经不需要用到了 
+'''
+'''oldcompany = xlrd.open_workbook("test1.xlsx")#先打开该excel
+sheet = oldcompany.sheet_by_index(0)
+Company_select = sheet.col_values(colx=0)
+
+b =1
+for i in Company_select:
+    Search(i)'''
+
+'''wb = openpyxl.load_workbook('userdata.xlsx')#加载excel文件
+    sh = wb['没有地名的客户']
+    sh['B%s'%b] = Newname
+    b+=1
+
+    wb.save('userdata.xlsx')'''
+
+
+
+
+
+
+
